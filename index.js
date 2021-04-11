@@ -3,6 +3,8 @@ let table2 = document.querySelector(".output_table");
 let table3 = document.querySelector(".visual_table");
 const button = document.getElementById("btn_addRow");
 const button_start = document.getElementById("btn_simulate");
+const rr = document.querySelector("#rr");
+const timeQuantumInput = document.querySelector("#timeQuantum-input");
 var pName = document.getElementById("pName");
 var pArrivalTime = document.getElementById("pArrivalTime");
 var pBustTime = document.getElementById("pBustTime");
@@ -12,13 +14,15 @@ var pArray = Array.from(Array(10), () => new Array(2));
 var pWaitingTime = Array.from({length:10}, ()=>0);
 var pTurnAroundTime = new Array(10);
 var pNormalizedTT = new Array(10);
-var time = new Array(20);
+var time = new Array(1000);
 var selectedAlgorithm;
 var totalTime = 0;
 
 let row1 = table3.insertRow(0);
 let row2 = table3.insertRow(1);
 var z=0;
+
+var timeQuantum;
 
 class Queue {
     constructor(){
@@ -187,20 +191,27 @@ function runAlgorithm(){
         setInterval(addVisual, 300);
 
     }
-    
+    else if(selectedAlgorithm === "rr"){
+        timeQuantum = timeQuantumInput.value;
+        console.log(timeQuantum);
+    }
 }
 
-function handleButtonStart(){
+function handleButtonSimulate(){
     getSelectedAlgorithm();
     sortArray();
     getTotalTime();
     runAlgorithm();
 }
 
+function handleRR(){
+    document.querySelector(".timeQuantum").classList.remove("noShowing");
+}
 
 function init(){
     button.addEventListener("click", addRow);
-    button_start.addEventListener("click", handleButtonStart);
+    button_start.addEventListener("click", handleButtonSimulate);
+    rr.addEventListener("click", handleRR);
 }
 
 init();

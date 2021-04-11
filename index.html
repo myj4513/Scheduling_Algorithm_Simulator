@@ -21,17 +21,20 @@
       </tr>
     </table>
 
-    <input type="button" id="btn_addRow" value="add row" /><br />
+    <input type="button" id="btn_addRow" value="Add Row" /><br />
 
     <div>
       <input type="radio" name="schedulingAlgorithm" value="fcfs" /> FCFS
-      <input type="radio" name="schedulingAlgorithm" value="rr" /> RR
+      <input type="radio" name="schedulingAlgorithm" value="rr" id="rr" /> RR
       <input type="radio" name="schedulingAlgorithm" value="spn" /> SPN
       <input type="radio" name="schedulingAlgorithm" value="srtn" /> SRTN
       <input type="radio" name="schedulingAlgorithm" value="hrrn" /> HRRN
       <input type="radio" name="schedulingAlgorithm" value="new" /> NEW
+      <div class="timeQuantum noShowing">
+        Time Quantum:<input type="text" id="timeQuantum-input" />
+      </div>
     </div>
-    <input type="button" id="btn_simulate" value="simulate" />
+    <input type="button" id="btn_simulate" value="Simulate" />
 
     <div id="box"><table class="visual_table noShowing"></table></div>
 
