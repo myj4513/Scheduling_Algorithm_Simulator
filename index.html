@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="index.css" />
+    <title>Basic Scheduling Algorithm Simulator</title>
+  </head>
+  <body>
+    <table class="insert_table">
+      <tr>
+        <td>Name</td>
+        <td>Arrival Time</td>
+        <td>Bust Time</td>
+      </tr>
+      <tr>
+        <td><input type="text" id="pName" /><br /></td>
+        <td><input type="text" id="pArrivalTime" /><br /></td>
+        <td><input type="text" id="pBustTime" /><br /></td>
+      </tr>
+    </table>
+
+    <input type="button" id="btn_addRow" value="add row" /><br />
+
+    <div>
+      <input type="radio" name="schedulingAlgorithm" value="fcfs" /> FCFS
+      <input type="radio" name="schedulingAlgorithm" value="rr" /> RR
+      <input type="radio" name="schedulingAlgorithm" value="spn" /> SPN
+      <input type="radio" name="schedulingAlgorithm" value="srtn" /> SRTN
+      <input type="radio" name="schedulingAlgorithm" value="hrrn" /> HRRN
+      <input type="radio" name="schedulingAlgorithm" value="new" /> NEW
+    </div>
+    <input type="button" id="btn_simulate" value="simulate" />
+
+    <div id="box"><table class="visual_table noShowing"></table></div>
+
+    <table class="output_table noShowing">
+      <tr>
+        <td>Name</td>
+        <td>Arrival Time</td>
+        <td>Bust Time</td>
+        <td>Waiting Time</td>
+        <td>Turnaround Time</td>
+        <td>Normalized TT</td>
+      </tr>
+    </table>
+
+    <script src="index.js"></script>
+  </body>
+</html>
