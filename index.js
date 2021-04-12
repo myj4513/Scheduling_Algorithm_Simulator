@@ -7,10 +7,10 @@ const rr = document.querySelector("#rr");
 const timeQuantumInput = document.querySelector("#timeQuantum-input");
 var pName = document.getElementById("pName");
 var pArrivalTime = document.getElementById("pArrivalTime");
-var pBustTime = document.getElementById("pBustTime");
+var pBurstTime = document.getElementById("pBurstTime");
 var index = 0;
 
-var pArray = Array.from(Array(10), () => new Array(2));
+var pArray = Array.from(Array(15), () => new Array(2));
 var pWaitingTime = Array.from({length:10}, ()=>0);
 var pTurnAroundTime = new Array(10);
 var pNormalizedTT = new Array(10);
@@ -51,13 +51,13 @@ function addRow(){
     let cell2 = row.insertCell(1);
     let text2 = document.createTextNode(pArrivalTime.value);
     let cell3 = row.insertCell(2);
-    let text3 = document.createTextNode(pBustTime.value);
+    let text3 = document.createTextNode(pBurstTime.value);
     cell1.appendChild(text1);
     cell2.appendChild(text2);
     cell3.appendChild(text3);
     pArray[index][0] = pName.value;
     pArray[index][1] = Number(pArrivalTime.value);
-    pArray[index][2] = pBustTime.value;
+    pArray[index][2] = pBurstTime.value;
     index = index + 1;
 }
 
