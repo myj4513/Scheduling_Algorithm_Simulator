@@ -95,20 +95,10 @@ function run(){
 
 function getOutputTable_rr(){
     for(var i=0;i<1000;i++){
-        if(time[i]===pArray[0][0]){
-            pTurnAroundTime[0] = Number(i+1);
-        }
-        if(time[i]===pArray[1][0]){
-            pTurnAroundTime[1] = Number(i+1);
-        }
-        if(time[i]===pArray[2][0]){
-            pTurnAroundTime[2] = Number(i+1);
-        }
-        if(time[i]===pArray[3][0]){
-            pTurnAroundTime[3] = Number(i+1);
-        }
-        if(time[i]===pArray[4][0]){
-            pTurnAroundTime[4] = Number(i+1);
+        for(var j=0;j<15;j++){
+            if(time[i]===pArray[j][0]){
+                pTurnAroundTime[j] = Number(i+1);
+            }
         }
     }
     for(var i=0;i<index;i++){
@@ -135,7 +125,6 @@ function addRow(){
     pArray_copy[index][0] = pName.value;
     pArray_copy[index][1] = Number(pArrivalTime.value);
     pArray_copy[index][2] = Number(pBurstTime.value);
-    console.log(pArray[index][0],pArray[index][1],pArray[index][2]);
     index = index + 1;
 }
 
@@ -216,26 +205,6 @@ function addOutput(){
     }
 }
 
-function setPColor(z){
-    for(let i=0; i<(z*2);i++){
-        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[0][0]){
-            table3.getElementsByTagName("td")[i].style.backgroundColor = "lightpink";
-        }
-        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[1][0]){
-            table3.getElementsByTagName("td")[i].style.backgroundColor = "lightcoral";
-        }
-        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[2][0]){
-            table3.getElementsByTagName("td")[i].style.backgroundColor = "skyblue";
-        }
-        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[3][0]){
-            table3.getElementsByTagName("td")[i].style.backgroundColor = "yellow";
-        }
-        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[4][0]){
-            table3.getElementsByTagName("td")[i].style.backgroundColor = "paleturquoise";
-        }
-    }
-}
-
 function showHiddenTables(){
     table2.classList.remove("noShowing");
     table3.classList.remove("noShowing");
@@ -300,3 +269,54 @@ function init(){
 }
 
 init();
+
+function setPColor(z){
+    let colorTd = table3.getElementsByTagName("td")
+    for(let i=0; i<(z*2);i++){
+        if(colorTd[i].innerHTML === pArray[0][0]){
+            colorTd[i].style.backgroundColor = "lightpink";
+        }
+        if(colorTd[i].innerHTML === pArray[1][0]){
+            colorTd[i].style.backgroundColor = "lightcoral";
+        }
+        if(colorTd[i].innerHTML === pArray[2][0]){
+            colorTd[i].style.backgroundColor = "skyblue";
+        }
+        if(colorTd[i].innerHTML === pArray[3][0]){
+            colorTd[i].style.backgroundColor = "yellow";
+        }
+        if(colorTd[i].innerHTML === pArray[4][0]){
+            colorTd[i].style.backgroundColor = "paleturquoise";
+        }
+        if(colorTd[i].innerHTML === pArray[5][0]){
+            colorTd[i].style.backgroundColor = "aquamarine";
+        }
+        if(colorTd[i].innerHTML === pArray[6][0]){
+            colorTd[i].style.backgroundColor = "bisque";
+        }
+        if(colorTd[i].innerHTML === pArray[7][0]){
+            colorTd[i].style.backgroundColor = "greenyellow";
+        }
+        if(colorTd[i].innerHTML === pArray[8][0]){
+            colorTd[i].style.backgroundColor = "lightcyan";
+        }
+        if(colorTd[i].innerHTML === pArray[9][0]){
+            colorTd[i].style.backgroundColor = "lemonchiffon";
+        }
+        if(colorTd[i].innerHTML === pArray[10][0]){
+            colorTd[i].style.backgroundColor = "palegreen";
+        }
+        if(colorTd[i].innerHTML === pArray[11][0]){
+            colorTd[i].style.backgroundColor = "salmon";
+        }
+        if(colorTd[i].innerHTML === pArray[12][0]){
+            colorTd[i].style.backgroundColor = "pink";
+        }
+        if(colorTd[i].innerHTML === pArray[13][0]){
+            colorTd[i].style.backgroundColor = "sandybrown";
+        }
+        if(colorTd[i].innerHTML === pArray[14][0]){
+            colorTd[i].style.backgroundColor = "palegoldenred";
+        }
+    }
+}
