@@ -10,6 +10,7 @@ var pArrivalTime = document.getElementById("pArrivalTime");
 var pBurstTime = document.getElementById("pBurstTime");
 var index = 0;
 
+let SPNSET = new Set();
 
 let k = 0;
 
@@ -45,6 +46,38 @@ class Queue {
 
 const q = new Queue();
 
+function addToSet(){
+    for(let i=0;i<index;i++){
+        SPNSET.add(pArray[i][0]);
+    }
+}
+
+function getMin(a){
+    let min = 20;
+    let minIndex;
+    for(let i=0;i<index;i++){
+        if(SPNSET.has(pArray[i][0])){
+            if(pArray[i][2]<=min && a>=pArray[i][1]){
+                min = pArray[i][2];
+                minIndex = Number(i);
+            }
+        }
+    }
+    SPNSET.delete(pArray[minIndex][0]);
+    return minIndex;
+}
+
+function solveSPN(){
+    for(let a=0;a<totalTime;){
+        let Min = getMin(a);
+        for(let j=0;j<pArray[Min][2];j++){
+            time[k] = pArray[Min][0];
+            k++;
+            a++;
+        }
+    }
+}
+
 function getTotalTime(){
     for(var i=0;i<index;i++){
         totalTime += Number(pArray[i][2]);
@@ -52,7 +85,7 @@ function getTotalTime(){
 }
 
 function addToQueue_rr(){
-    for(var i=0;i<1000;i++){
+    for(var i=0;i<totalTime;i++){
         for(var m=index-1;m>=0;m--){
             if(i===pArray_copy[m][1]){
                 q.enqueue(pArray_copy[m]);
@@ -94,7 +127,7 @@ function run(){
 }
 
 function getOutputTable_rr(){
-    for(var i=0;i<1000;i++){
+    for(var i=0;i<totalTime;i++){
         for(var j=0;j<15;j++){
             if(time[i]===pArray[j][0]){
                 pTurnAroundTime[j] = Number(i+1);
@@ -129,7 +162,7 @@ function addRow(){
 }
 
 function addToQueue(){
-    for(let i=0;i<1000;i++){
+    for(let i=0;i<totalTime;i++){
         for(let j=0;j<index;j++){
             if(i === Number(pArray[j][1])){
                 q.enqueue(pArray[j]);
@@ -145,26 +178,6 @@ function getProcessor(){
             time[k] = x[0];
             k++;
         }
-    }
-}
-
-function getPWT(){
-    for(var i=1;i<index;i++){
-        for(var j=0;j<i;j++){
-            pWaitingTime[i] += Number(pArray[j][2]);
-        }
-        pWaitingTime[i] -= pArray[i][1];
-    }
-}
-function getPTAT(){
-    for(var i=0;i<index;i++){
-        pTurnAroundTime[i] = Number(pArray[i][2])+pWaitingTime[i];
-    }
-}
-
-function getPNTT(){
-    for(var i=0;i<index;i++){
-        pNormalizedTT[i] = pTurnAroundTime[i]/Number(pArray[i][2]);
     }
 }
 
@@ -233,9 +246,7 @@ function runAlgorithm(){
     if(selectedAlgorithm === "fcfs"){
         addToQueue();
         getProcessor();
-        getPWT();
-        getPTAT();
-        getPNTT();
+        getOutputTable_rr();
         showHiddenTables();
         addOutput();
         setInterval(addVisual, 300);
@@ -244,6 +255,14 @@ function runAlgorithm(){
     else if(selectedAlgorithm === "rr"){
         getTimeQuantum();
         addToQueue_rr();
+        showHiddenTables();
+        getOutputTable_rr();
+        addOutput();
+        setInterval(addVisual, 300);
+    }
+    else if(selectedAlgorithm === "spn"){
+        addToSet();
+        solveSPN();
         showHiddenTables();
         getOutputTable_rr();
         addOutput();
