@@ -10,10 +10,14 @@ var pArrivalTime = document.getElementById("pArrivalTime");
 var pBurstTime = document.getElementById("pBurstTime");
 var index = 0;
 
+
+let k = 0;
+
 var pArray = Array.from(Array(15), () => new Array(2));
-var pWaitingTime = Array.from({length:10}, ()=>0);
-var pTurnAroundTime = new Array(10);
-var pNormalizedTT = new Array(10);
+var pArray_copy = Array.from(Array(15), () => new Array(2));
+var pWaitingTime = Array.from({length:15}, ()=>0);
+var pTurnAroundTime = new Array(15);
+var pNormalizedTT = new Array(15);
 var time = new Array(1000);
 var selectedAlgorithm;
 var totalTime = 0;
@@ -34,6 +38,9 @@ class Queue {
     dequeue(){
         return this._arr.shift();
     }
+    isEmpty(){
+        return this._arr.length === 0;
+    }
 }
 
 const q = new Queue();
@@ -41,6 +48,73 @@ const q = new Queue();
 function getTotalTime(){
     for(var i=0;i<index;i++){
         totalTime += Number(pArray[i][2]);
+    }
+}
+
+function addToQueue_rr(){
+    for(var i=0;i<20;i++){
+        for(var j=index-1;j>=0;j--){
+            if(i===pArray_copy[j][1]){
+                q.enqueue(pArray_copy[j]);
+                run();
+            }
+        }
+    }
+}
+
+function run(){
+    let remainBT
+    while(!q.isEmpty()){
+        x = q.dequeue();
+        remainBT = x[2];
+        let p = Number(k-1);
+        if(remainBT<timeQuantum){
+            for(var j=0;j<x[2];j++){
+                time[k] = x[0];
+                remainBT--;
+                k++;
+            }
+        }
+        else{
+            for(var j=0;j<timeQuantum;j++){
+                time[k] = x[0];
+                remainBT--;
+                k++;
+            }
+        }
+        if(remainBT>0){
+            for(var i=0;i<index;i++){
+                if(x[0]==pArray_copy[i][0]){
+                    pArray_copy[i][1] = p + timeQuantum;
+                    pArray_copy[i][2] = remainBT;
+                }
+            }
+        }  
+    }  
+}
+
+function getOutputTable_rr(){
+    for(var i=0;i<20;i++){
+        if(time[i]==="p1"){
+            pTurnAroundTime[0] = Number(i+1);
+        }
+        if(time[i]==="p2"){
+            pTurnAroundTime[1] = Number(i+1);
+        }
+        if(time[i]==="p3"){
+            pTurnAroundTime[2] = Number(i+1);
+        }
+        if(time[i]==="p4"){
+            pTurnAroundTime[3] = Number(i+1);
+        }
+        if(time[i]==="p5"){
+            pTurnAroundTime[4] = Number(i+1);
+        }
+    }
+    for(var i=0;i<index;i++){
+        pWaitingTime[i] = pTurnAroundTime[i] - pArray[i][1] - pArray[i][2];
+        pTurnAroundTime[i] = pWaitingTime[i] + pArray[i][2];
+        pNormalizedTT[i] = pTurnAroundTime[i]/pArray[i][2];
     }
 }
 
@@ -57,7 +131,11 @@ function addRow(){
     cell3.appendChild(text3);
     pArray[index][0] = pName.value;
     pArray[index][1] = Number(pArrivalTime.value);
-    pArray[index][2] = pBurstTime.value;
+    pArray[index][2] = Number(pBurstTime.value);
+    pArray_copy[index][0] = pName.value;
+    pArray_copy[index][1] = Number(pArrivalTime.value);
+    pArray_copy[index][2] = Number(pBurstTime.value);
+    console.log(pArray[index][0],pArray[index][1],pArray[index][2]);
     index = index + 1;
 }
 
@@ -72,7 +150,6 @@ function addToQueue(){
 }
 
 function getProcessor(){
-    let k = 0;
     for(let j = 0;j<index;j++){
         let x = q.dequeue(); 
         for(let i=0;i<x[2];i++){
@@ -151,7 +228,7 @@ function setPColor(z){
             table3.getElementsByTagName("td")[i].style.backgroundColor = "skyblue";
         }
         if(table3.getElementsByTagName("td")[i].innerHTML === "p4"){
-            table3.getElementsByTagName("td")[i].style.backgroundColor = "salmon";
+            table3.getElementsByTagName("td")[i].style.backgroundColor = "yellow";
         }
         if(table3.getElementsByTagName("td")[i].innerHTML === "p5"){
             table3.getElementsByTagName("td")[i].style.backgroundColor = "paleturquoise";
@@ -179,6 +256,10 @@ function sortArray(){
     });
 }
 
+function getTimeQuantum(){
+    timeQuantum = Number(timeQuantumInput.value);
+}
+
 function runAlgorithm(){
     if(selectedAlgorithm === "fcfs"){
         addToQueue();
@@ -192,8 +273,12 @@ function runAlgorithm(){
 
     }
     else if(selectedAlgorithm === "rr"){
-        timeQuantum = timeQuantumInput.value;
-        console.log(timeQuantum);
+        getTimeQuantum();
+        addToQueue_rr();
+        showHiddenTables();
+        getOutputTable_rr();
+        addOutput();
+        setInterval(addVisual, 300);
     }
 }
 
