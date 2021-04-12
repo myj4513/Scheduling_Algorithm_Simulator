@@ -52,10 +52,10 @@ function getTotalTime(){
 }
 
 function addToQueue_rr(){
-    for(var i=0;i<20;i++){
-        for(var j=index-1;j>=0;j--){
-            if(i===pArray_copy[j][1]){
-                q.enqueue(pArray_copy[j]);
+    for(var i=0;i<1000;i++){
+        for(var m=index-1;m>=0;m--){
+            if(i===pArray_copy[m][1]){
+                q.enqueue(pArray_copy[m]);
                 run();
             }
         }
@@ -67,7 +67,7 @@ function run(){
     while(!q.isEmpty()){
         x = q.dequeue();
         remainBT = x[2];
-        let p = Number(k-1);
+        let p = Number(k);
         if(remainBT<timeQuantum){
             for(var j=0;j<x[2];j++){
                 time[k] = x[0];
@@ -85,7 +85,7 @@ function run(){
         if(remainBT>0){
             for(var i=0;i<index;i++){
                 if(x[0]==pArray_copy[i][0]){
-                    pArray_copy[i][1] = p + timeQuantum;
+                    pArray_copy[i][1] = p + timeQuantum; //오반데;;
                     pArray_copy[i][2] = remainBT;
                 }
             }
@@ -94,20 +94,20 @@ function run(){
 }
 
 function getOutputTable_rr(){
-    for(var i=0;i<20;i++){
-        if(time[i]==="p1"){
+    for(var i=0;i<1000;i++){
+        if(time[i]===pArray[0][0]){
             pTurnAroundTime[0] = Number(i+1);
         }
-        if(time[i]==="p2"){
+        if(time[i]===pArray[1][0]){
             pTurnAroundTime[1] = Number(i+1);
         }
-        if(time[i]==="p3"){
+        if(time[i]===pArray[2][0]){
             pTurnAroundTime[2] = Number(i+1);
         }
-        if(time[i]==="p4"){
+        if(time[i]===pArray[3][0]){
             pTurnAroundTime[3] = Number(i+1);
         }
-        if(time[i]==="p5"){
+        if(time[i]===pArray[4][0]){
             pTurnAroundTime[4] = Number(i+1);
         }
     }
@@ -140,7 +140,7 @@ function addRow(){
 }
 
 function addToQueue(){
-    for(let i=0;i<20;i++){
+    for(let i=0;i<1000;i++){
         for(let j=0;j<index;j++){
             if(i === Number(pArray[j][1])){
                 q.enqueue(pArray[j]);
@@ -218,19 +218,19 @@ function addOutput(){
 
 function setPColor(z){
     for(let i=0; i<(z*2);i++){
-        if(table3.getElementsByTagName("td")[i].innerHTML === "p1"){
+        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[0][0]){
             table3.getElementsByTagName("td")[i].style.backgroundColor = "lightpink";
         }
-        if(table3.getElementsByTagName("td")[i].innerHTML === "p2"){
+        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[1][0]){
             table3.getElementsByTagName("td")[i].style.backgroundColor = "lightcoral";
         }
-        if(table3.getElementsByTagName("td")[i].innerHTML === "p3"){
+        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[2][0]){
             table3.getElementsByTagName("td")[i].style.backgroundColor = "skyblue";
         }
-        if(table3.getElementsByTagName("td")[i].innerHTML === "p4"){
+        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[3][0]){
             table3.getElementsByTagName("td")[i].style.backgroundColor = "yellow";
         }
-        if(table3.getElementsByTagName("td")[i].innerHTML === "p5"){
+        if(table3.getElementsByTagName("td")[i].innerHTML === pArray[4][0]){
             table3.getElementsByTagName("td")[i].style.backgroundColor = "paleturquoise";
         }
     }
