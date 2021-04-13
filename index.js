@@ -8,20 +8,22 @@ const timeQuantumInput = document.querySelector("#timeQuantum-input");
 var pName = document.getElementById("pName");
 var pArrivalTime = document.getElementById("pArrivalTime");
 var pBurstTime = document.getElementById("pBurstTime");
+
 var index = 0;
+var pNum = 0;
 
 let SPNSET = new Set();
 
-let k = 0;
+let currentTime = 0;
+let totalTime = 0;
 
 var pArray = Array.from(Array(15), () => new Array(2));
 var pArray_copy = Array.from(Array(15), () => new Array(2));
 var pWaitingTime = Array.from({length:15}, ()=>0);
 var pTurnAroundTime = new Array(15);
 var pNormalizedTT = new Array(15);
-var time = new Array(1000);
+var processor = Array.from(()=>0);
 var selectedAlgorithm;
-var totalTime = 0;
 
 let row1 = table3.insertRow(0);
 let row2 = table3.insertRow(1);
@@ -46,18 +48,83 @@ class Queue {
 
 const q = new Queue();
 
-function addToSet(){
-    for(let i=0;i<index;i++){
-        SPNSET.add(pArray[i][0]);
+function solveFCFS(){
+    while(pNum !== 0){
+        for(let j=0;j<index;j++){
+            if(currentTime === Number(pArray_copy[j][1])){
+                q.enqueue(pArray_copy[j]);
+            }
+        }
+        if(processor[currentTime]===undefined){
+            if(!q.isEmpty()){
+                x = q.dequeue();
+                pNum--;
+                for(let i=0;i<x[2];i++){
+                    processor[currentTime] = x[0];
+                    currentTime++;
+                    totalTime=currentTime;
+                }
+                currentTime=currentTime-x[2];
+            }
+        }
+        currentTime++;
     }
 }
 
-function getMin(a){
-    let min = 20;
+function getTimeQuantum(){
+    timeQuantum = Number(timeQuantumInput.value);
+}
+
+function solveRR(){
+    while(pNum !== 0){
+        for(let j=index-1;j>=0;j--){
+            if(currentTime===pArray_copy[j][1]){
+                q.enqueue(pArray_copy[j]);
+            }
+        }
+        if(processor[currentTime]===undefined){
+            if(!q.isEmpty()){
+                runRR();
+            }
+        }
+        currentTime++;
+    }
+}
+
+function runRR(){
+    let remainBT;
+    x = q.dequeue();
+    remainBT = x[2];
+    if(remainBT<=timeQuantum){
+        for(var j=0;j<x[2];j++){
+            processor[currentTime] = x[0];
+            currentTime++;
+            totalTime=currentTime;
+        }
+        pNum--;
+        currentTime=currentTime-x[2];
+    }
+    else{
+        for(var j=0;j<timeQuantum;j++){
+            processor[currentTime] = x[0];
+            currentTime++;
+        }
+        for(let i=0;i<index;i++){
+            if(x[0]===pArray_copy[i][0]){
+                pArray_copy[i][1] = currentTime;
+                pArray_copy[i][2] = x[2]-timeQuantum;
+            }
+        }
+        currentTime=currentTime-timeQuantum;
+    } 
+}
+
+function getMin(){
+    let min = 100;
     let minIndex;
     for(let i=0;i<index;i++){
         if(SPNSET.has(pArray[i][0])){
-            if(pArray[i][2]<=min && a>=pArray[i][1]){
+            if(pArray[i][2]<=min){
                 min = pArray[i][2];
                 minIndex = Number(i);
             }
@@ -65,71 +132,35 @@ function getMin(a){
     }
     SPNSET.delete(pArray[minIndex][0]);
     return minIndex;
-}
+} 
 
 function solveSPN(){
-    for(let a=0;a<totalTime;){
-        let Min = getMin(a);
-        for(let j=0;j<pArray[Min][2];j++){
-            time[k] = pArray[Min][0];
-            k++;
-            a++;
-        }
-    }
-}
-
-function getTotalTime(){
-    for(var i=0;i<index;i++){
-        totalTime += Number(pArray[i][2]);
-    }
-}
-
-function addToQueue_rr(){
-    for(var i=0;i<totalTime;i++){
-        for(var m=index-1;m>=0;m--){
-            if(i===pArray_copy[m][1]){
-                q.enqueue(pArray_copy[m]);
-                run();
+    while(pNum !== 0){
+        for(let j=0;j<index;j++){
+            if(currentTime === Number(pArray[j][1])){
+                SPNSET.add(pArray[j][0]);
             }
         }
-    }
-}
-
-function run(){
-    let remainBT
-    while(!q.isEmpty()){
-        x = q.dequeue();
-        remainBT = x[2];
-        let p = Number(k);
-        if(remainBT<timeQuantum){
-            for(var j=0;j<x[2];j++){
-                time[k] = x[0];
-                remainBT--;
-                k++;
-            }
-        }
-        else{
-            for(var j=0;j<timeQuantum;j++){
-                time[k] = x[0];
-                remainBT--;
-                k++;
-            }
-        }
-        if(remainBT>0){
-            for(var i=0;i<index;i++){
-                if(x[0]==pArray_copy[i][0]){
-                    pArray_copy[i][1] = p + timeQuantum; //오반데;;
-                    pArray_copy[i][2] = remainBT;
+        if(processor[currentTime]===undefined){
+            if(SPNSET.size !== 0){
+                let Min = getMin();
+                pNum--;
+                for(let j=0;j<pArray[Min][2];j++){
+                    processor[currentTime] = pArray[Min][0];
+                    currentTime++;
+                    totalTime=currentTime;
                 }
+                currentTime=currentTime-pArray[Min][2];
             }
-        }  
-    }  
+        }
+        currentTime++;
+    }
 }
 
-function getOutputTable_rr(){
+function getOutputTable(){
     for(var i=0;i<totalTime;i++){
-        for(var j=0;j<15;j++){
-            if(time[i]===pArray[j][0]){
+        for(var j=0;j<index;j++){
+            if(processor[i]===pArray[j][0]){
                 pTurnAroundTime[j] = Number(i+1);
             }
         }
@@ -141,52 +172,12 @@ function getOutputTable_rr(){
     }
 }
 
-function addRow(){
-    let row = table1.insertRow(index+1);
-    let cell1 = row.insertCell(0);
-    let text1 = document.createTextNode(pName.value);
-    let cell2 = row.insertCell(1);
-    let text2 = document.createTextNode(pArrivalTime.value);
-    let cell3 = row.insertCell(2);
-    let text3 = document.createTextNode(pBurstTime.value);
-    cell1.appendChild(text1);
-    cell2.appendChild(text2);
-    cell3.appendChild(text3);
-    pArray[index][0] = pName.value;
-    pArray[index][1] = Number(pArrivalTime.value);
-    pArray[index][2] = Number(pBurstTime.value);
-    pArray_copy[index][0] = pName.value;
-    pArray_copy[index][1] = Number(pArrivalTime.value);
-    pArray_copy[index][2] = Number(pBurstTime.value);
-    index = index + 1;
-}
-
-function addToQueue(){
-    for(let i=0;i<totalTime;i++){
-        for(let j=0;j<index;j++){
-            if(i === Number(pArray[j][1])){
-                q.enqueue(pArray[j]);
-            }
-        }
-    }
-}
-
-function getProcessor(){
-    for(let j = 0;j<index;j++){
-        let x = q.dequeue(); 
-        for(let i=0;i<x[2];i++){
-            time[k] = x[0];
-            k++;
-        }
-    }
-}
-
 function addVisual(){
     if(z<totalTime){
         let cell1 = row1.insertCell(z);
         let cell2 = row2.insertCell(z);
         let text1 = document.createTextNode(z+1);
-        let text2 = document.createTextNode(time[z]);
+        let text2 = document.createTextNode(processor[z]);
         cell1.appendChild(text1);
         cell2.appendChild(text2);
         z++;
@@ -232,49 +223,48 @@ function getSelectedAlgorithm(){
     })
 }
 
-function sortArray(){
-    pArray.sort(function(a,b){
-        return a[1] - b[1];
-    });
-}
-
-function getTimeQuantum(){
-    timeQuantum = Number(timeQuantumInput.value);
+function addRow(){
+    let row = table1.insertRow(index+1);
+    let cell1 = row.insertCell(0);
+    let text1 = document.createTextNode(pName.value);
+    let cell2 = row.insertCell(1);
+    let text2 = document.createTextNode(pArrivalTime.value);
+    let cell3 = row.insertCell(2);
+    let text3 = document.createTextNode(pBurstTime.value);
+    cell1.appendChild(text1);
+    cell2.appendChild(text2);
+    cell3.appendChild(text3);
+    pArray[index][0] = pName.value;
+    pArray[index][1] = Number(pArrivalTime.value);
+    pArray[index][2] = Number(pBurstTime.value);
+    pArray_copy[index][0] = pName.value;
+    pArray_copy[index][1] = Number(pArrivalTime.value);
+    pArray_copy[index][2] = Number(pBurstTime.value);
+    index = index + 1;
+    pNum = index;
 }
 
 function runAlgorithm(){
     if(selectedAlgorithm === "fcfs"){
-        addToQueue();
-        getProcessor();
-        getOutputTable_rr();
-        showHiddenTables();
-        addOutput();
-        setInterval(addVisual, 300);
-
+        solveFCFS();
     }
     else if(selectedAlgorithm === "rr"){
         getTimeQuantum();
-        addToQueue_rr();
-        showHiddenTables();
-        getOutputTable_rr();
-        addOutput();
-        setInterval(addVisual, 300);
+        solveRR();
     }
     else if(selectedAlgorithm === "spn"){
-        addToSet();
         solveSPN();
-        showHiddenTables();
-        getOutputTable_rr();
-        addOutput();
-        setInterval(addVisual, 300);
     }
 }
 
 function handleButtonSimulate(){
+    document.querySelector("#aa").style.width = 700+'px';
     getSelectedAlgorithm();
-    sortArray();
-    getTotalTime();
     runAlgorithm();
+    showHiddenTables();
+    getOutputTable();
+    addOutput();
+    setInterval(addVisual, 300);
 }
 
 function handleRR(){
