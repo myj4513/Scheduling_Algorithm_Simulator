@@ -16,9 +16,13 @@ let SPNSET = new Set();
 
 let currentTime = 0;
 let totalTime = 0;
+let isRunning = false;
+let runningProcessName;
+let runningProcessRemainBT;
+
+let executeNum = 0;
 
 var pArray = Array.from(Array(15), () => new Array(2));
-var pArray_copy = Array.from(Array(15), () => new Array(2));
 var pWaitingTime = Array.from({length:15}, ()=>0);
 var pTurnAroundTime = new Array(15);
 var pNormalizedTT = new Array(15);
@@ -51,20 +55,30 @@ const q = new Queue();
 function solveFCFS(){
     while(pNum !== 0){
         for(let j=0;j<index;j++){
-            if(currentTime === Number(pArray_copy[j][1])){
-                q.enqueue(pArray_copy[j]);
+            if(currentTime === Number(pArray[j][1])){
+                q.enqueue(pArray[j]);
             }
         }
-        if(processor[currentTime]===undefined){
+        if(isRunning === false){
             if(!q.isEmpty()){
                 x = q.dequeue();
-                pNum--;
-                for(let i=0;i<x[2];i++){
-                    processor[currentTime] = x[0];
-                    currentTime++;
-                    totalTime=currentTime;
+                processor[currentTime] = x[0];
+                runningProcessName = x[0];
+                runningProcessRemainBT = x[2]-1;
+                if(runningProcessRemainBT>0){
+                    isRunning = true;
                 }
-                currentTime=currentTime-x[2];
+                else{
+                    pNum--;
+                }
+            }
+        }
+        else{//isRunning === true;
+            processor[currentTime] = runningProcessName;
+            runningProcessRemainBT = runningProcessRemainBT-1;
+            if(runningProcessRemainBT===0){
+                isRunning = false;
+                pNum--;
             }
         }
         currentTime++;
@@ -77,13 +91,30 @@ function getTimeQuantum(){
 
 function solveRR(){
     while(pNum !== 0){
-        for(let j=index-1;j>=0;j--){
-            if(currentTime===pArray_copy[j][1]){
-                q.enqueue(pArray_copy[j]);
+        for(let j=0;j<index;j++){
+            if(currentTime===pArray[j][1]){
+                q.enqueue(pArray[j]);
             }
         }
-        if(processor[currentTime]===undefined){
+        if(isRunning===false){
             if(!q.isEmpty()){
+                runRR();
+            }
+        }
+        else{//isRunning === true; 이미 실행중인 프로세스가 있다면
+            if(executeNum<timeQuantum){ //timequantum 횟수보다 덜 실행했다면
+                processor[currentTime] = runningProcessName;
+                runningProcessRemainBT = runningProcessRemainBT-1;
+                if(runningProcessRemainBT>0){ //실행하고도 burstTime이 남았다면
+                    executeNum++;
+                }
+                else{//runningProcessRemainBT===0 //실행후 burstTime이 0 이라면(프로세스 1개 완료)
+                    pNum--;
+                    isRunning = false;
+                }
+            }
+            else{//executeNum === timeQuantum; timeQuantum 횟수만큼 실행했다면
+                q.enqueue([runningProcessName,currentTime,runningProcessRemainBT]);
                 runRR();
             }
         }
@@ -92,31 +123,19 @@ function solveRR(){
 }
 
 function runRR(){
-    let remainBT;
     x = q.dequeue();
-    remainBT = x[2];
-    if(remainBT<=timeQuantum){
-        for(var j=0;j<x[2];j++){
-            processor[currentTime] = x[0];
-            currentTime++;
-            totalTime=currentTime;
-        }
-        pNum--;
-        currentTime=currentTime-x[2];
+    executeNum=0;
+    processor[currentTime] = x[0];
+    runningProcessName = x[0];
+    runningProcessRemainBT = x[2]-1;
+    if(runningProcessRemainBT>0){
+        executeNum++;
+        isRunning = true;
     }
     else{
-        for(var j=0;j<timeQuantum;j++){
-            processor[currentTime] = x[0];
-            currentTime++;
-        }
-        for(let i=0;i<index;i++){
-            if(x[0]===pArray_copy[i][0]){
-                pArray_copy[i][1] = currentTime;
-                pArray_copy[i][2] = x[2]-timeQuantum;
-            }
-        }
-        currentTime=currentTime-timeQuantum;
-    } 
+        pNum--;
+        isRunning = false;
+    }
 }
 
 function getMin(){
@@ -141,16 +160,26 @@ function solveSPN(){
                 SPNSET.add(pArray[j][0]);
             }
         }
-        if(processor[currentTime]===undefined){
+        if(isRunning===false){
             if(SPNSET.size !== 0){
                 let Min = getMin();
-                pNum--;
-                for(let j=0;j<pArray[Min][2];j++){
-                    processor[currentTime] = pArray[Min][0];
-                    currentTime++;
-                    totalTime=currentTime;
+                processor[currentTime] = pArray[Min][0];
+                runningProcessName = pArray[Min][0];
+                runningProcessRemainBT = pArray[Min][2]-1;
+                if(runningProcessRemainBT>0){
+                    isRunning = true;
                 }
-                currentTime=currentTime-pArray[Min][2];
+                else{
+                    pNum--;
+                }
+            }
+        }
+        else{//isRunning === true;
+            processor[currentTime] = runningProcessName;
+            runningProcessRemainBT = runningProcessRemainBT-1;
+            if(runningProcessRemainBT===0){
+                isRunning = false;
+                pNum--;
             }
         }
         currentTime++;
@@ -158,7 +187,7 @@ function solveSPN(){
 }
 
 function getOutputTable(){
-    for(var i=0;i<totalTime;i++){
+    for(var i=0;i<currentTime;i++){
         for(var j=0;j<index;j++){
             if(processor[i]===pArray[j][0]){
                 pTurnAroundTime[j] = Number(i+1);
@@ -173,7 +202,7 @@ function getOutputTable(){
 }
 
 function addVisual(){
-    if(z<totalTime){
+    if(z<currentTime){
         let cell1 = row1.insertCell(z);
         let cell2 = row2.insertCell(z);
         let text1 = document.createTextNode(z+1);
@@ -237,9 +266,6 @@ function addRow(){
     pArray[index][0] = pName.value;
     pArray[index][1] = Number(pArrivalTime.value);
     pArray[index][2] = Number(pBurstTime.value);
-    pArray_copy[index][0] = pName.value;
-    pArray_copy[index][1] = Number(pArrivalTime.value);
-    pArray_copy[index][2] = Number(pBurstTime.value);
     index = index + 1;
     pNum = index;
 }
