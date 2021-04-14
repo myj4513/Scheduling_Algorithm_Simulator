@@ -14,26 +14,26 @@ var pNum = 0;
 
 let SPNSET = new Set();
 
+var timeQuantum;
+var selectedAlgorithm;
 let currentTime = 0;
 let totalTime = 0;
 let isRunning = false;
 let runningProcessName;
 let runningProcessRemainBT;
-
 let executeNum = 0;
 
-var pArray = Array.from(Array(15), () => new Array(2));
+var pArray = Array.from(Array(15), () => new Array(4));
 var pWaitingTime = Array.from({length:15}, ()=>0);
 var pTurnAroundTime = new Array(15);
 var pNormalizedTT = new Array(15);
 var processor = Array.from(()=>0);
-var selectedAlgorithm;
 
 let row1 = table3.insertRow(0);
 let row2 = table3.insertRow(1);
 var z=0;
 
-var timeQuantum;
+let queue = new Array();
 
 class Queue {
     constructor(){
@@ -47,6 +47,9 @@ class Queue {
     }
     isEmpty(){
         return this._arr.length === 0;
+    }
+    size(){
+        return this._arr.length;
     }
 }
 
@@ -122,13 +125,13 @@ function solveRR(){
     }
 }
 
-function runRR(){
+function runRR(){ //실행중인 프로세스가 없을때 동작하는 함수
     x = q.dequeue();
     executeNum=0;
     processor[currentTime] = x[0];
-    runningProcessName = x[0];
     runningProcessRemainBT = x[2]-1;
-    if(runningProcessRemainBT>0){
+    if(runningProcessRemainBT>0){// 한번에 안끝난경우
+        runningProcessName = x[0];
         executeNum++;
         isRunning = true;
     }
@@ -138,7 +141,7 @@ function runRR(){
     }
 }
 
-function getMin(){
+function getMinSPN(){
     let min = 100;
     let minIndex;
     for(let i=0;i<index;i++){
@@ -162,7 +165,7 @@ function solveSPN(){
         }
         if(isRunning===false){
             if(SPNSET.size !== 0){
-                let Min = getMin();
+                let Min = getMinSPN();
                 processor[currentTime] = pArray[Min][0];
                 runningProcessName = pArray[Min][0];
                 runningProcessRemainBT = pArray[Min][2]-1;
@@ -177,6 +180,101 @@ function solveSPN(){
         else{//isRunning === true;
             processor[currentTime] = runningProcessName;
             runningProcessRemainBT = runningProcessRemainBT-1;
+            if(runningProcessRemainBT===0){
+                isRunning = false;
+                pNum--;
+            }
+        }
+        currentTime++;
+    }
+}
+
+function getMinSRTN(){
+    let min = 100;
+    let minIndex;
+    for(let i=queue.length-1;i>=0;i--){
+        if(queue[i][2]<=min){
+            min = queue[i][2];
+            minIndex = Number(i);
+        }
+    }
+    let temp = queue[0];
+    queue[0] = queue[minIndex];
+    queue[minIndex] = temp;
+}
+
+function solveSRTN(){
+    while(pNum!==0){
+        for(let j=0;j<index;j++){
+            if(currentTime===pArray[j][1]){
+                queue.push(pArray[j]);
+            }
+        }
+        if(queue.length!==0){
+            getMinSRTN();
+            x=queue.shift();
+            processor[currentTime] = x[0];
+            runningProcessName = x[0];
+            runningProcessRemainBT = x[2]-1;
+            if(runningProcessRemainBT>0){
+                queue.push([runningProcessName, currentTime, runningProcessRemainBT]);
+            }
+            else{
+                pNum--;
+            }
+        }
+        currentTime++;
+    }
+}
+
+function getMaxHRRN(){
+    let max = 0;
+    let maxIndex;
+    for(let i=0;i<queue.length;i++){
+        let responseRatio = (queue[i][3]+queue[i][2])/queue[i][2];
+        if(responseRatio>=max){
+            max=responseRatio;
+            maxIndex = Number(i);
+        }
+    }
+    let temp = queue[0];
+    queue[0] = queue[maxIndex];
+    queue[maxIndex] = temp;
+}
+
+function addWaitingTime(){
+    for(let j=0;j<queue.length;j++){
+        queue[j][3]++;
+    }
+}
+
+function solveHRRN(){
+    while(pNum !== 0){
+        for(let j=0;j<index;j++){
+            if(currentTime === Number(pArray[j][1])){
+                queue.push(pArray[j]);
+            }
+        }
+        if(isRunning === false){
+            if(queue.length!==0){
+                getMaxHRRN();
+                x=queue.shift(); 
+                processor[currentTime] = x[0];
+                runningProcessName = x[0];
+                runningProcessRemainBT = x[2]-1;
+                addWaitingTime();
+                if(runningProcessRemainBT>0){
+                    isRunning =true;
+                }
+                else{
+                    pNum--;
+                }
+            }
+        }
+        else{//isRunning === true;
+            processor[currentTime] = runningProcessName;
+            runningProcessRemainBT = runningProcessRemainBT-1;
+            addWaitingTime();
             if(runningProcessRemainBT===0){
                 isRunning = false;
                 pNum--;
@@ -266,6 +364,7 @@ function addRow(){
     pArray[index][0] = pName.value;
     pArray[index][1] = Number(pArrivalTime.value);
     pArray[index][2] = Number(pBurstTime.value);
+    pArray[index][3] = 0;
     index = index + 1;
     pNum = index;
 }
@@ -280,6 +379,12 @@ function runAlgorithm(){
     }
     else if(selectedAlgorithm === "spn"){
         solveSPN();
+    }
+    else if(selectedAlgorithm === "srtn"){
+        solveSRTN();
+    }
+    else if(selectedAlgorithm === "hrrn"){
+        solveHRRN();
     }
 }
 
