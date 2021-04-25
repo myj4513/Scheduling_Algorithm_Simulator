@@ -2,57 +2,118 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="index.css" />
     <title>Basic Scheduling Algorithm Simulator</title>
   </head>
   <body>
-    <div id="aa">
-      <table class="insert_table">
-        <tr>
-          <td>Name</td>
-          <td>Arrival Time</td>
-          <td>Burst Time</td>
-        </tr>
-        <tr>
-          <td><input type="text" id="pName" /><br /></td>
-          <td><input type="text" id="pArrivalTime" /><br /></td>
-          <td><input type="text" id="pBurstTime" /><br /></td>
-        </tr>
-      </table>
+    <h2>&lt;Scheduling Simulator&gt;</h2>
+    <!-- inputArea와 outputArea를 전부 감싸는 영역 -->
+    <div class="main">
+      <!-- inputArea -->
+      <div class="row">
+        <!-- process의 이름, Arrival Time, Burst Time을 입력받는 영역 -->
+        <div class="column" style="padding-bottom: 0">
+          <table class="insert_table">
+            <tr>
+              <td>Process Name</td>
+              <td>Arrival Time</td>
+              <td>Burst Time</td>
+            </tr>
+            <tr>
+              <td><input type="text" id="pName" /><br /></td>
+              <td><input type="number" id="pArrivalTime" /><br /></td>
+              <td><input type="number" id="pBurstTime" /><br /></td>
+            </tr>
+          </table>
+          <input type="button" id="btn_addRow" value="Add Row" /><br />
+        </div>
+        <!-- 스케줄링 기법을 선택하는 영역 -->
+        <div class="column">
+          <div class="selectAlgorithm">
+            <div>
+              <div class="selectAlgorithmOption">
+                <input
+                  type="radio"
+                  name="schedulingAlgorithm"
+                  value="fcfs"
+                />FCFS
+              </div>
 
-      <input type="button" id="btn_addRow" value="Add Row" /><br />
+              <div class="selectAlgorithmOption">
+                <input
+                  type="radio"
+                  name="schedulingAlgorithm"
+                  value="rr"
+                  id="rr"
+                />RR
+              </div>
 
-      <div class="bb">
-        <input type="radio" name="schedulingAlgorithm" value="fcfs" /> FCFS
-        <input type="radio" name="schedulingAlgorithm" value="rr" id="rr" /> RR
-        <input type="radio" name="schedulingAlgorithm" value="spn" /> SPN
-        <input type="radio" name="schedulingAlgorithm" value="srtn" /> SRTN
-        <input type="radio" name="schedulingAlgorithm" value="hrrn" /> HRRN
-        <input type="radio" name="schedulingAlgorithm" value="new" /> NEW
-        <div class="timeQuantum noShowing">
-          <input
-            type="text"
-            id="timeQuantum-input"
-            placeholder="time quantum"
-          />
+              <div class="selectAlgorithmOption">
+                <input type="radio" name="schedulingAlgorithm" value="spn" />
+                SPN
+              </div>
+            </div>
+
+            <div>
+              <div class="selectAlgorithmOption">
+                <input type="radio" name="schedulingAlgorithm" value="srtn" />
+                SRTN
+              </div>
+
+              <div class="selectAlgorithmOption">
+                <input type="radio" name="schedulingAlgorithm" value="hrrn" />
+                HRRN
+              </div>
+
+              <div class="selectAlgorithmOption">
+                <input
+                  type="radio"
+                  id="new"
+                  name="schedulingAlgorithm"
+                  value="new"
+                />
+                NEW
+              </div>
+            </div>
+          </div>
+          <!-- 우선순위 프로세스를 선택하는 영역 -->
+          <div class="priority"></div>
+
+          <div>
+            <div>
+              <!-- Round Robin 스케줄링 기법의 Time Quantum을 입력받는 영역 -->
+              <div class="timeQuantum noShowing">
+                Time Quantum :
+                <input type="text" id="timeQuantum-input" />
+              </div>
+            </div>
+            <!-- 멀티 코어의 여부를 입력받는 영역 -->
+            <div class="multicore">
+              <input type="checkbox" id="multiCore" />Multi-Core?
+              <input type="text" class="multiCoreNum noShowing" />
+            </div>
+          </div>
+          <input type="button" id="btn_simulate" value="Simulate" />
         </div>
       </div>
-      <input type="button" id="btn_simulate" value="Simulate" />
 
-      <div id="box"><table class="visual_table noShowing"></table></div>
-
-      <table class="output_table noShowing">
-        <tr>
-          <td>Name</td>
-          <td>Arrival Time</td>
-          <td>Burst Time</td>
-          <td>Waiting Time</td>
-          <td>Turnaround Time</td>
-          <td>Normalized TT</td>
-        </tr>
-      </table>
+      <!-- 출력 결과를 보여주는 영역-->
+      <div class="row noShowing">
+        <!-- Gannt Chart를 보여주는 영역-->
+        <div><table class="visual_table noShowing"></table></div>
+        <!-- 각 프로세스별 이름, Arrival Time, Burst Time, Waiting Time, Turnaround Time, Normalized TT를 출력하는 영역-->
+        <table class="output_table noShowing">
+          <tr>
+            <td>Name</td>
+            <td>Arrival Time</td>
+            <td>Burst Time</td>
+            <td>Waiting Time</td>
+            <td>Turnaround Time</td>
+            <td>Normalized TT</td>
+          </tr>
+        </table>
+      </div>
     </div>
     <script src="index.js"></script>
   </body>
